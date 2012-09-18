@@ -126,8 +126,11 @@ static NSString * const kAFIncrementalStoreResourceIdentifierAttributeName = @"_
     fetchRequest.fetchLimit = 1;
     fetchRequest.predicate = [NSPredicate predicateWithFormat:@"%K = %@", kAFIncrementalStoreResourceIdentifierAttributeName, resourceIdentifier];
     
-    NSError *error = nil;
-    NSArray *results = [[self backingManagedObjectContext] executeFetchRequest:fetchRequest error:&error];
+    __block NSError *error = nil;
+    __block NSArray *results = [NSArray array];
+    [[self backingManagedObjectContext] performBlock:^{
+        results = [[self backingManagedObjectContext] executeFetchRequest:fetchRequest error:&error];
+    }];
     if (error) {
         NSLog(@"Error: %@", error);
         return nil;
@@ -215,12 +218,16 @@ static NSString * const kAFIncrementalStoreResourceIdentifierAttributeName = @"_
                 }
             }
         }
-        NSError *error = nil;
-        if (![backingContext save:&error] || ![context save:&error]) {
-            NSLog(@"Error: %@", error);
-        } else if (completionBlock) {
-            completionBlock();
-        }
+        
+        [backingContext performBlock:^{
+            NSError *error = nil;
+            if (![backingContext save:&error] || ![context save:&error]) {
+                NSLog(@"Error: %@", error);
+            } else if (completionBlock) {
+                completionBlock();
+            }
+        }];
+
     }];
     
 }
@@ -351,8 +358,9 @@ static NSString * const kAFIncrementalStoreResourceIdentifierAttributeName = @"_
                                                                      withContext:childContext
                                                                       completion:^{
                                                                           [context performBlock:^{
-                                                                              if (![context save:error]) {
-                                                                                  NSLog(@"Error: %@", *error);
+                                                                              NSError *error = nil;
+                                                                              if (![context save:&error]) {
+                                                                                  NSLog(@"Error: %@", error);
                                                                               }
                                                                           }];
                                                                       }];
