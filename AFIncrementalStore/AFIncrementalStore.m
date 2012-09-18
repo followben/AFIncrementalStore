@@ -167,7 +167,9 @@ static NSString * const kAFIncrementalStoreResourceIdentifierAttributeName = @"_
                 NSRelationshipDescription *relationship = [[entity relationshipsByName] valueForKey:relationshipName];
                 
                 if (relationship) {
-                    if ([relationship isToMany]) {
+                    if ([relationship isToMany] &&
+                        ([relationshipRepresentationOrArrayOfRepresentations isKindOfClass:[NSDictionary class]] ||
+                         [relationshipRepresentationOrArrayOfRepresentations isKindOfClass:[NSArray class]])) {
                         id mutableManagedRelationshipObjects = [relationship isOrdered] ? [NSMutableOrderedSet orderedSet] : [NSMutableSet set];
                         id mutableBackingRelationshipObjects = [relationship isOrdered] ? [NSMutableOrderedSet orderedSet] : [NSMutableSet set];
                         
@@ -192,7 +194,7 @@ static NSString * const kAFIncrementalStoreResourceIdentifierAttributeName = @"_
                         
                         [backingObject setValue:mutableBackingRelationshipObjects forKey:relationship.name];
                         [managedObject setValue:mutableManagedRelationshipObjects forKey:relationship.name];
-                    } else {
+                    } else if ([relationshipRepresentationOrArrayOfRepresentations isKindOfClass:[NSDictionary class]]) {
                         NSString *relationshipResourceIdentifier = [self.HTTPClient resourceIdentifierForRepresentation:relationshipRepresentationOrArrayOfRepresentations ofEntity:relationship.destinationEntity fromResponse:response];
                         NSDictionary *relationshipAttributes = [self.HTTPClient attributesForRepresentation:relationshipRepresentationOrArrayOfRepresentations ofEntity:relationship.destinationEntity fromResponse:response];
                         
