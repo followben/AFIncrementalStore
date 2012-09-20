@@ -287,11 +287,19 @@ static NSString * const kAFIncrementalStoreResourceIdentifierAttributeName = @"_
         
         [backingContext performBlock:^{
             NSError *error = nil;
-            if (![backingContext save:&error] || ![context save:&error]) {
+            if (![backingContext save:&error]) {
                 NSLog(@"Error: %@", error);
-            } else if (completionBlock) {
-                completionBlock();
+            } else {
+                [context performBlock:^{
+                    NSError *error = nil;
+                    if (![context save:&error]) {
+                        NSLog(@"Error: %@", error);
+                    } else if (completionBlock) {
+                        completionBlock();
+                    }
+                }];
             }
+            
         }];
 
     }];
