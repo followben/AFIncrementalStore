@@ -131,6 +131,21 @@
                                      fromResponse:(NSHTTPURLResponse *)response;
 
 /**
+ Returns the entity for a representation in the specified response. This would normally be the entity itself however it may a subentity. This method is used to get the attributes of the managed object from its representation returned in `-representationOrArrayOfRepresentationsFromResponseObject` or `representationsForRelationshipsFromRepresentation:ofEntity:fromResponse:`.
+ 
+ @discussion For example, if the representation returned from `GET /products/123` has a relationship called `notes` with a destination entity of `Note` in it's Core Data model, but the representation maps to a subentity of `Note` in the model called `TechnicalNote`. This method would return the entity `TechnicalNote`.
+ 
+ @param representation The resource representation.
+ @param entity The entity for the representation.
+ @param response The HTTP response for the resource request.
+ 
+ @return An `NSEntityDescription` matching the specified entity.
+ */
+- (NSEntityDescription *)entityForRepresentation:(NSDictionary *)representation
+                                        ofEntity:(NSEntityDescription *)entity
+                                    fromResponse:(NSHTTPURLResponse *)response;
+
+/**
  Returns the attributes for the managed object corresponding to the representation of an entity from the specified response. This method is used to get the attributes of the managed object from its representation returned in `-representationOrArrayOfRepresentationsFromResponseObject` or `representationsForRelationshipsFromRepresentation:ofEntity:fromResponse:`.
  
  @discussion For example, if the representation returned from `GET /products/123` had a `description` field that corresponded with the `productDescription` attribute in its Core Data model, this method would set the value of the `productDescription` key in the returned dictionary to the value of the `description` field in representation.
