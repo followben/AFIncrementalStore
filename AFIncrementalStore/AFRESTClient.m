@@ -114,6 +114,13 @@ static NSString * AFPluralizedString(NSString *string) {
     return nil;
 }
 
+- (NSEntityDescription *)entityForRepresentation:(NSDictionary *)representation
+                                        ofEntity:(NSEntityDescription *)entity
+                                    fromResponse:(NSHTTPURLResponse *)response
+{
+    return entity;
+}
+
 - (NSDictionary *)attributesForRepresentation:(NSDictionary *)representation
                                      ofEntity:(NSEntityDescription *)entity
                                  fromResponse:(NSHTTPURLResponse *)response
